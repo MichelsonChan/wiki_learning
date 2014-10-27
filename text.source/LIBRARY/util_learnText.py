@@ -8,12 +8,12 @@ import TEXT
 import DSP
 fileList = os.listdir('.')
 
-#### ========================== #
-#### remove .sort and .np files #
-#### ========================== #
-###for fileName in fileList :
-###	if re.search( "\.np" , fileName ) :
-###		os.remove( fileName )
+# ========================== #
+# remove .sort and .np files #
+# ========================== #
+for fileName in fileList :
+	if re.search( "\.np" , fileName ) :
+		os.remove( fileName )
 
 # ======================================= #
 # prepare dictionary hash first for later #
@@ -41,12 +41,12 @@ for Idx_wikiFile in range( 0 , len(wikiFileList) ) :
 	if re.search( "\.sort" , fileName ) :
 		fileHash = {}
 		print "now processing : %s" %(fileName)
-		###if os.path.isfile( fileName + '.np' ) :
-		###	os.remove( fileName + '.np' )	
-		###fileName_preproc = TEXT.PREPROCESS( fileName )
-		### .np and .np.sort are generated
-		###fileObject = open( fileName_preproc )
-		fileObject = open( fileName )
+		if os.path.isfile( fileName + '.np' ) :
+			os.remove( fileName + '.np' )	
+		fileName_preproc = TEXT.PREPROCESS( fileName )
+		 .np and .np.sort are generated
+		fileObject = open( fileName_preproc )
+		#fileObject = open( fileName )
 		wordList   = fileObject.read().splitlines()
 		fileObject.close()
 		wordHash = {}
