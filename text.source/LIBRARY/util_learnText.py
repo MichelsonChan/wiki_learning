@@ -130,8 +130,8 @@ S = np.zeros( [ modelOrder , fileNum ] )
 # recover S part #
 # -------------- #
 for Idx_wikiFile in xrange( 0 , fileNum ) :
-	print "Wikipedia File no.: %d" %(Idx_wikiFile)
-	print Y_currCol[ existWordList_hash[word] , 0 ] = existWord[ word ][ Idx_wikiFile ]trftime("%Y-%m-%d %H:%M:%S", gmtime())
+	print "Wikipedia File no.: %d" %(Idx_wikiFile)	
+	print strftime("%Y-%m-%d %H:%M:%S", gmtime())	
 	# --------------------------------- #
 	# obtain the corresponding Y column #
 	# --------------------------------- #
