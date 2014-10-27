@@ -8,12 +8,12 @@ import TEXT
 import DSP
 fileList = os.listdir('.')
 
-# ========================== #
-# remove .sort and .np files #
-# ========================== #
-for fileName in fileList :
-	if re.search( "\.np" , fileName ) :
-		os.remove( fileName )
+#### ========================== #
+#### remove .sort and .np files #
+#### ========================== #
+###for fileName in fileList :
+###	if re.search( "\.np" , fileName ) :
+###		os.remove( fileName )
 
 # ======================================= #
 # prepare dictionary hash first for later #
@@ -41,12 +41,12 @@ for Idx_wikiFile in range( 0 , len(wikiFileList) ) :
 	if re.search( "\.sort" , fileName ) :
 		fileHash = {}
 		print "now processing : %s" %(fileName)
-		if os.path.isfile( fileName + '.np' ) :
-			os.remove( fileName + '.np' )	
-		fileName_preproc = TEXT.PREPROCESS( fileName )
-		 .np and .np.sort are generated
-		fileObject = open( fileName_preproc )
-		#fileObject = open( fileName )
+		###if os.path.isfile( fileName + '.np' ) :
+		###	os.remove( fileName + '.np' )	
+		###fileName_preproc = TEXT.PREPROCESS( fileName )
+		### .np and .np.sort are generated
+		###fileObject = open( fileName_preproc )
+		fileObject = open( fileName )
 		wordList   = fileObject.read().splitlines()
 		fileObject.close()
 		wordHash = {}
@@ -135,17 +135,15 @@ for Idx_wikiFile in xrange( 0 , fileNum ) :
 	# --------------------------------- #
 	# obtain the corresponding Y column #
 	# --------------------------------- #
-	#Y_currCol = np.zeros( [ len(existWordList) , 1 ] )
-	Y_currCol = np.zeros(  len(existWordList) ) #scipy.optimize.nnls requires np.array
+	Y_currCol = np.zeros(  len(existWordList) ) #scipy.optimize.nnls uses np.array
 	for word in wikiHash[ Idx_wikiFile ][ '_wordprofile' ] :
-		#if existWord[ word ].has_key( Idx_wikiFile ] :
-		#Y_currCol[ existWordList_hash[word] , 0 ] = existWord[ word ][ Idx_wikiFile ]
 		Y_currCol[ existWordList_hash[word] ] = existWord[ word ][ Idx_wikiFile ]
 	S_Jcolumn = DSP.NNLS( Y_currCol , A )
-	S[ : , Idx_wikiFile:Idx_wikiFile+1 ] = S_Jcolumn
-#----------------------------------
-del Idx_wikiFile , word , S_Jcolumn
-#----------------------------------
+	for k in xrange( 0 , modelOrder ) :
+		S[ k , Idx_wikiFile ] = S_Jcolumn[k]
+#--------------------------------------------------
+del Idx_wikiFile , Y_currCol , word , S_Jcolumn , k
+#--------------------------------------------------
 # -------------- #
 # recover A part #
 # -------------- #
