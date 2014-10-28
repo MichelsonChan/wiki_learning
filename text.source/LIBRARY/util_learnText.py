@@ -6,6 +6,7 @@ from time import gmtime, strftime
 import numpy as np
 import TEXT
 import DSP
+import NMF
 fileList = os.listdir('.')
 
 #### ========================== #
@@ -80,6 +81,7 @@ for Idx_wikiFile in xrange( 0 , fileNum ) :
 			existWordList.append( word )
 			#existWord[ word ] = np.zeros( fileNum , dtype=np.uint8 )
 			existWord[ word ] = {} # will store word occurance
+wordNum = len(existWordList)
 #-------------------------------------------------------------
 del Idx_wikiFile , singleFile_wordProfile , word_n_freq , word
 #-------------------------------------------------------------
@@ -121,30 +123,45 @@ del Idx_word , Idx_wikiFile , wordProfile_ofCurrWikiFile
 # and  min || Y[i,:]' - S' * A[i,:]' ||    #
 # ---------------------------------------- #
 modelOrder = 8 
+iteraNum   = 100
 # ------------------ #
 # initialize A and S #
 # ------------------ #
-A = np.random.ranf( [ len(existWordList) , modelOrder ] ) * 6
-S = np.zeros( [ modelOrder , fileNum ] )
-# -------------- #
-# recover S part #
-# -------------- #
-for Idx_wikiFile in xrange( 0 , fileNum ) :
-	print "Wikipedia File no.: %d" %(Idx_wikiFile)	
-	print strftime("%Y-%m-%d %H:%M:%S", gmtime())	
-	# --------------------------------- #
-	# obtain the corresponding Y column #
-	# --------------------------------- #
-	Y_currCol = np.zeros(  len(existWordList) ) #scipy.optimize.nnls uses np.array
-	for word in wikiHash[ Idx_wikiFile ][ '_wordprofile' ] :
-		Y_currCol[ existWordList_hash[word] ] = existWord[ word ][ Idx_wikiFile ]
-	S_Jcolumn = DSP.NNLS( Y_currCol , A )
-	for k in xrange( 0 , modelOrder ) :
-		S[ k , Idx_wikiFile ] = S_Jcolumn[k]
-#--------------------------------------------------
-del Idx_wikiFile , Y_currCol , word , S_Jcolumn , k
-#--------------------------------------------------
-# -------------- #
-# recover A part #
-# -------------- #
+A = np.random.ranf( [ wordNum , modelOrder ] ) * 6
+S = np.random.ranf( [ modelOrder , fileNum ] ) * 6
+# ---------------------------- #
+# NMF iteration ( using LSMU ) #
+# ---------------------------- #
+for cycle in xrange( 0 , iteraNum ) :
+	# ------------- #
+	# update S part #
+	# ------------- #
+	for J_Idx_wikiFile in xrange( 0 , fileNum ) :
+		print "Cycle No. : %d / %d\tFile No. : %d / %d" %(cycle,iteraNum,J_Idx_wikiFile,fileNum)
+		# --------------------------------- #
+		# obtain the corresponding Y column #
+		# --------------------------------- #
+		Y_currCol = np.zeros(  wordNum ) #scipy.optimize.nnls uses np.array
+		for word in wikiHash[ J_Idx_wikiFile ][ '_wordprofile' ] :
+			Y_currCol[ existWordList_hash[word] ] = existWord[ word ][ J_Idx_wikiFile ]
+		#A_no_use , S_Jcolumn = NMF.LSMU( Y_currCol , A , S[ : , J_Idx_wikiFile ] , 1 , 1 )
+		A_no_use , S_Jcolumn = NMF.LSMU( np.matrix( Y_currCol ).transpose() , A , np.matrix( S[ : , J_Idx_wikiFile ] ).transpose() , 1 , 1 )
+		for k in xrange( 0 , modelOrder ) :
+			S[ k , J_Idx_wikiFile ] = S_Jcolumn[k]
+	# ------------- #
+	# update A part #
+	# ------------- #	
+	Y_currRow = np.zeros( fileNum )
+	for I_Idx_existWord in xrange( 0 , wordNum ) :
+		print "Cycle No. : %d / %d\tWord No. : %d / %d" %(cycle,iteraNum,I_Idx_existWord,wordNum)
+		for Idx_wikiFile in xrange( 0 , fileNum ) :
+			currFile_wordProfile = wikiHash[ Idx_wikiFile ][ '_wordprofile' ]
+			if currFile_wordProfile.has_key( existWordList[I_Idx_existWord] ) :
+				Y_currRow[ Idx_wikiFile ] = currFile_wordProfile[ existWordList[ I_Idx_existWord ] ]
+				break
+		A_Irow , S_no_use = NMF.LSMU( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord , : ] ) , S , 1 , 0 )
+		A[ I_Idx_existWord , : ] = A_Irow
+# ------------- #
+# export result #
+# ------------- #
 
