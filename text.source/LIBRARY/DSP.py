@@ -59,9 +59,6 @@ def STOP( stopFileNameStr=None ) :
 			elif userInput == "Y" or userInput == "y" :
 				os.remove( stopFileNameStr )
 				return
-					print "Press enter/return to continue ..."
-					raw_input()
-				return
 	else :
 		if os.path.isfile( stopFileNameStr ) :
 			# a stop file is found
