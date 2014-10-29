@@ -47,12 +47,21 @@ def LOG( actionStr , arg1 , arg2 , arg3 ) :
 # ==== #
 def STOP( stopFileNameStr=None ) :
 	if stopFileNameStr == None :
-		if os.path.isfile('stop') :
+		stopFileNameStr = 'stop'
+		if os.path.isfile( stopFileNameStr ) :
 			# a stopping request exists
 			print "A stopping request is found ! System paused !"
-			print "Press enter/return to continue ..."
-			raw_input()
-		return
+			print "Press N to continue ..."
+			print "Press Y to remove stopping signal \"" + stopFileNameStr + "\" and continue ..."
+			userInput = raw_input()
+			if   userInput == "N" or userInput == "n" :
+				return
+			elif userInput == "Y" or userInput == "y" :
+				os.remove( stopFileNameStr )
+				return
+					print "Press enter/return to continue ..."
+					raw_input()
+				return
 	else :
 		if os.path.isfile( stopFileNameStr ) :
 			# a stop file is found
@@ -60,9 +69,9 @@ def STOP( stopFileNameStr=None ) :
 			print "Press N to continue ..."
 			print "Press Y to remove " + stopFileNameStr + " and continue ..."
 			userInput = raw_input()
-			if userInput == "N" :
+			if   userInput == "N" or userInput == "n" :
 				return
-			elif userInput == "Y" :
+			elif userInput == "Y" or userInput == "y" :
 				os.remove( stopFileNameStr )
 				return
 
