@@ -107,19 +107,19 @@ del Idx_word , Idx_wikiFile , wordProfile_ofCurrWikiFile
 # ===================== #
 # Log Y matrix to Y.txt #
 # ===================== #
-
-fileObject = open( 'Y.txt' , 'w' )
-Y_currRow = np.zeros( fileNum )
-for I_Idx_existWord in xrange( 0 , wordNum ) :
-	for Idx_wikiFile in xrange( 0 , fileNum ) :
-		currFile_wordProfile = wikiHash[ Idx_wikiFile ][ '_wordprofile' ]
-		if currFile_wordProfile.has_key( existWordList[I_Idx_existWord] ) :
-			Y_currRow[ Idx_wikiFile ] = currFile_wordProfile[ existWordList[ I_Idx_existWord ] ]
-			break
-	for i in xrange( len( Y_currRow ) ) :
-		fileObject.write( str( Y_currRow[i]  ) + ' ' )
-	fileObject.write('\n')
-fileObject.close()
+if not os.path.isfile( 'Y.txt' ) :
+	fileObject = open( 'Y.txt' , 'w' )
+	Y_currRow = np.zeros( fileNum )
+	for I_Idx_existWord in xrange( 0 , wordNum ) :
+		for Idx_wikiFile in xrange( 0 , fileNum ) :
+			currFile_wordProfile = wikiHash[ Idx_wikiFile ][ '_wordprofile' ]
+			if currFile_wordProfile.has_key( existWordList[I_Idx_existWord] ) :
+				Y_currRow[ Idx_wikiFile ] = currFile_wordProfile[ existWordList[ I_Idx_existWord ] ]
+				break
+		for i in xrange( len( Y_currRow ) ) :
+			fileObject.write( str( Y_currRow[i]  ) + ' ' )
+		fileObject.write('\n')
+	fileObject.close()
 
 
 
