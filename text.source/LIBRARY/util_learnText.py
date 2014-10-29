@@ -111,6 +111,7 @@ if not os.path.isfile( 'Y.txt' ) :
 	fileObject = open( 'Y.txt' , 'w' )
 	Y_currRow = np.zeros( fileNum )
 	for I_Idx_existWord in xrange( 0 , wordNum ) :
+		print "Writing file : %d / %d ..." %(I_Idx_existWord,wordNum)
 		for Idx_wikiFile in xrange( 0 , fileNum ) :
 			currFile_wordProfile = wikiHash[ Idx_wikiFile ][ '_wordprofile' ]
 			if currFile_wordProfile.has_key( existWordList[I_Idx_existWord] ) :
