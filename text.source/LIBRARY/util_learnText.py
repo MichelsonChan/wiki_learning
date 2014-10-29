@@ -122,8 +122,8 @@ del Idx_word , Idx_wikiFile , wordProfile_ofCurrWikiFile
 # i.e. min || Y[:,j]  - A  * S[:,j]  ||    #
 # and  min || Y[i,:]' - S' * A[i,:]' ||    #
 # ---------------------------------------- #
-modelOrder = 8 
-iteraNum   = 100
+modelOrder = 50 
+iteraNum   = 5
 # ------------------ #
 # initialize A and S #
 # ------------------ #
@@ -137,7 +137,7 @@ for cycle in xrange( 0 , iteraNum ) :
 	# update S part #
 	# ------------- #
 	for J_Idx_wikiFile in xrange( 0 , fileNum ) :
-		print "Cycle No. : %d / %d\tFile No. : %d / %d" %(cycle,iteraNum,J_Idx_wikiFile,fileNum)
+		print "Cycle No. : %d / %d\tFile No. : %d / %d" %(cycle+1,iteraNum,J_Idx_wikiFile,fileNum)
 		# --------------------------------- #
 		# obtain the corresponding Y column #
 		# --------------------------------- #
@@ -153,7 +153,7 @@ for cycle in xrange( 0 , iteraNum ) :
 	# ------------- #	
 	Y_currRow = np.zeros( fileNum )
 	for I_Idx_existWord in xrange( 0 , wordNum ) :
-		print "Cycle No. : %d / %d\tWord No. : %d / %d" %(cycle,iteraNum,I_Idx_existWord,wordNum)
+		print "Cycle No. : %d / %d\tWord No. : %d / %d" %(cycle+1,iteraNum,I_Idx_existWord,wordNum)
 		for Idx_wikiFile in xrange( 0 , fileNum ) :
 			currFile_wordProfile = wikiHash[ Idx_wikiFile ][ '_wordprofile' ]
 			if currFile_wordProfile.has_key( existWordList[I_Idx_existWord] ) :
@@ -161,7 +161,9 @@ for cycle in xrange( 0 , iteraNum ) :
 				break
 		A_Irow , S_no_use = NMF.LSMU( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord , : ] ) , S , 1 , 0 )
 		A[ I_Idx_existWord , : ] = A_Irow
-# ------------- #
-# export result #
-# ------------- #
+	# ------------- #
+	# export result #
+	# ------------- #
+	DSP.LOG( 'log matrix to file' , 'A_itera'+str(cycle)+'.txt' , A , ' ' )
+	DSP.LOG( 'log matrix to file' , 'S_itera'+str(cycle)+'.txt' , S , ' ' )
 
