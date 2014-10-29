@@ -51,7 +51,7 @@ def STOP( stopFileNameStr=None ) :
 			# a stopping request exists
 			print "A stopping request is found ! System paused !"
 			print "Press enter/return to continue ..."
-			raw_inpiut()
+			raw_input()
 		return
 	else :
 		if os.path.isfile( stopFileNameStr ) :
