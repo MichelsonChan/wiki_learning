@@ -184,12 +184,11 @@ for cycle in xrange( 0 , iteraNum ) :
 				print "All Zeros Column encountered !"
 				print "a very small nonnegative value is used !"
 				Y_currCol[:,0] = 0.000000001
-		#A_no_use , S_Jcolumn = NMF.LSMU( Y_currCol , A , S[ : , J_Idx_wikiFile ] , 1 , 1 )
-		#A_no_use , S_Jcolumn = NMF.LSMU( np.matrix( Y_currCol ).transpose() , A , np.matrix( S[ : , J_Idx_wikiFile ] ).transpose() , 1 , 1 )
-		A_no_use , S_Jcolumn = NMF.HALS( np.matrix( Y_currCol ).transpose() , A , np.matrix( S[ : , J_Idx_wikiFile ] ).transpose() , [1,1] , 1 )
+		A_no_use , S_Jcolumn = NMF.HALS( np.matrix( Y_currCol ).transpose() , A , np.matrix( S[ : , J_Idx_wikiFile ] ).transpose() , 1 , [1,1] , 1 )
 		for k in xrange( 0 , modelOrder ) :
 			S[ k , J_Idx_wikiFile ] = S_Jcolumn[k]
-	DSP.LOG( 'log matrix to file' , 'S_itera'+str(cycle)+'.txt' , S , ' ' )
+	#DSP.LOG( 'log matrix to file' , 'S_LSMU_itera'+str(cycle+1)+'.txt' , S , ' ' )
+	DSP.LOG( 'log matrix to file' , 'S_HALS_itera'+str(cycle+1)+'.txt' , S , ' ' )
 	print "S has been logged in cycle %d" %(cycle+1)
 	DSP.STOP()
 	# ------------- #
@@ -204,9 +203,10 @@ for cycle in xrange( 0 , iteraNum ) :
 				Y_currRow[ Idx_wikiFile ] = currFile_wordProfile[ existWordList[ I_Idx_existWord ] ]
 				break
 		#A_Irow , S_no_use = NMF.LSMU( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord , : ] ) , S , 1 , 0 )
-		A_Irow , S_no_use = NMF.HALS( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord , : ] ) , S , [1,1] , 0 )
+		A_Irow , S_no_use = NMF.HALS( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord , : ] ) , S , 1 , [1,1] , 0 )
 		A[ I_Idx_existWord , : ] = A_Irow
-	DSP.LOG( 'log matrix to file' , 'A_itera'+str(cycle)+'.txt' , A , ' ' )
+	#DSP.LOG( 'log matrix to file' , 'A_LSMU_itera'+str(cycle+1)+'.txt' , A , ' ' )
+	DSP.LOG( 'log matrix to file' , 'A_HALS_itera'+str(cycle+1)+'.txt' , A , ' ' )
 	print "A has been logged in cycle %d" %(cycle+1)
 	print "Cycle %d has finished.  A and S has been logged." %(cycle+1)
 	DSP.STOP()
