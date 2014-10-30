@@ -314,7 +314,7 @@ def LSMU( V , W0 , H0 , iteraNum , firstUpdateMatrixFlag ) :
 def HALS_CORE( X , W , H , modelOrder ) :
 
 	for i in range( 0 , modelOrder ) :
-		print "\t\tstatus: %d / %d" %( i , modelOrder )
+		print "\t\tstatus: %d / %d" %( i+1 , modelOrder )
 
 		# ============================== #
 		# generate the index array       #
@@ -384,7 +384,7 @@ def HALS( Y , A0 , S0 , iteraNum , A2S_iteraRatioVector , firstUpdateMatrixFlag 
 	
 	if firstUpdateMatrixFlag == 0 :
 		for i in range( 0 , iteraNum ) :
-			print "iteration: %d / %d" %( i , iteraNum )
+			print "iteration: %d / %d" %( i+1 , iteraNum )
 			# =============== #
 			# update A matrix #
 			# =============== #
@@ -400,7 +400,7 @@ def HALS( Y , A0 , S0 , iteraNum , A2S_iteraRatioVector , firstUpdateMatrixFlag 
 				S = S.transpose()
 	elif firstUpdateMatrixFlag == 1 :
 		for i in range( 0 , iteraNum ) :
-			print "iteration: %d / %d" %( i , iteraNum )
+			print "iteration: %d / %d" %( i+1 , iteraNum )
 			# =============== #
 			# update S matrix #
 			# =============== #
