@@ -314,7 +314,7 @@ def LSMU( V , W0 , H0 , iteraNum , firstUpdateMatrixFlag ) :
 def HALS_CORE( X , W , H , modelOrder ) :
 
 	for i in range( 0 , modelOrder ) :
-		print "\t\tstatus: %d / %d" %( i , modelOrder )
+		print "\t\tstatus: %d / %d" %( i+1 , modelOrder )
 
 		# ============================== #
 		# generate the index array       #
@@ -347,7 +347,7 @@ def HALS_CORE( X , W , H , modelOrder ) :
 # ------------------- #
 # HALS interface part #
 # ------------------- #
-def HALS( Y , A0 , S0 , iteraNum , A2S_iteraRatioVector ) :
+def HALS( Y , A0 , S0 , iteraNum , A2S_iteraRatioVector , firstUpdateMatrixFlag ) :
 	
 	# ======================== #
 	# check dimension mismatch #
@@ -381,20 +381,38 @@ def HALS( Y , A0 , S0 , iteraNum , A2S_iteraRatioVector ) :
 		raw_input()
 		err
 		return -1
-
-	for i in range( 0 , iteraNum ) :
-		print "iteration: %d / %d" %( i , iteraNum )
-		# =============== #
-		# update A matrix #
-		# =============== #
-		print "update A matrix"
-		for k in range( 0 , A2S_iteraRatioVector[0] ) :
-			A = HALS_CORE( Y , A0 , S0 , modelOrder )
-		# =============== #                            	
-       		# update S matrix #
-       		# =============== #
-		print "update S matrix"
-       		for k in range( 0 , A2S_iteraRatioVector[1] ) :
-       			S = HALS_CORE( Y.transpose() , S0.transpose() , A0.transpose() , modelOrder )
-			S = S.transpose()
+	
+	if firstUpdateMatrixFlag == 0 :
+		for i in range( 0 , iteraNum ) :
+			print "iteration: %d / %d" %( i+1 , iteraNum )
+			# =============== #
+			# update A matrix #
+			# =============== #
+			print "update A matrix"
+			for k in range( 0 , A2S_iteraRatioVector[0] ) :
+				A = HALS_CORE( Y , A0 , S0 , modelOrder )
+			# =============== #                            	
+	       		# update S matrix #
+	       		# =============== #
+			print "update S matrix"
+	       		for k in range( 0 , A2S_iteraRatioVector[1] ) :
+	       			S = HALS_CORE( Y.transpose() , S0.transpose() , A0.transpose() , modelOrder )
+				S = S.transpose()
+	elif firstUpdateMatrixFlag == 1 :
+		for i in range( 0 , iteraNum ) :
+			print "iteration: %d / %d" %( i+1 , iteraNum )
+			# =============== #
+			# update S matrix #
+			# =============== #
+			print "update S matrix"
+			for k in range( 0 , A2S_iteraRatioVector[1] ) :
+				
+				S = HALS_CORE( Y.transpose() , S0.transpose() , A0.transpose() , modelOrder )
+				S = S.transpose()
+			# =============== #                            	
+			# update A matrix #
+			# =============== #
+			print "update A matrix"
+			for k in range( 0 , A2S_iteraRatioVector[0] ) :
+				A = HALS_CORE( Y , A0 , S0 , modelOrder )
 	return A , S
