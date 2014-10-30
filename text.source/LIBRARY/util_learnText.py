@@ -20,7 +20,7 @@ for fileName in fileList :
 # prepare dictionary hash first for later #
 # filtering unpopular words / nonenglish  #
 # ======================================= #
-fileObject = open ( 'dictionary.np' )
+fileObject = open ( 'dictionary_np' )
 dictList   = fileObject.read().splitlines()
 fileObject.close()
 dictHash = {}
@@ -38,14 +38,14 @@ wikiHash = {}
 Idx_processedFile = 0
 for Idx_wikiFile in range( 0 , len(wikiFileList) ) :
 	fileName = wikiFileList[ Idx_wikiFile ]
-	#if re.search( "text\." , fileName ) :
-	if re.search( "\.sort" , fileName ) :
+	if re.search( "text\." , fileName ) :
+	#if re.search( "\.sort" , fileName ) :
 		fileHash = {}
 		print "now processing : %s" %(fileName)
 		if os.path.isfile( fileName + '.np' ) :
 			os.remove( fileName + '.np' )	
 		fileName_preproc = TEXT.PREPROCESS( fileName )
-		 .np and .np.sort are generated
+		# .np and .np.sort are generated
 		fileObject = open( fileName_preproc )
 		#fileObject = open( fileName )
 		wordList   = fileObject.read().splitlines()
@@ -121,7 +121,7 @@ if not os.path.isfile( 'Y.txt' ) :
 			fileObject.write( str( Y_currRow[i]  ) + ' ' )
 		fileObject.write('\n')
 	fileObject.close()
-if not os.path.isfile( 'Y_transpose.txt' ) :
+#if not os.path.isfile( 'Y_transpose.txt' ) :
 	
 
 
