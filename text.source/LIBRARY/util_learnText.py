@@ -155,7 +155,7 @@ if os.path.isfile( 'A_init.txt' ) :
 	A = DSP.READMATRIX( 'A_init.txt' , ' ' )
 else :
 	print "no previous initial A matrix is found !"
-	A = np.random.ranf( [ wordNum , modelOrder ] ) * 6	
+	A = np.random.ranf( [ wordNum , modelOrder ] )
 	DSP.LOG( 'log matrix to file' , 'A_init.txt' , A , ' ' )
 	print "initial matrix A is generated and logged to file A_init.txt !"
 if os.path.isfile( 'S_init.txt' ) :
@@ -163,49 +163,90 @@ if os.path.isfile( 'S_init.txt' ) :
 	S = DSP.READMATRIX( 'S_init.txt' , ' ' )
 else :
 	print "no previous initial S matrix is found !"
-	S = np.random.ranf( [ modelOrder , fileNum ] ) * 6
+	S = np.random.ranf( [ modelOrder , fileNum ] )
 	DSP.LOG( 'log matrix to file' , 'S_init.txt' , S , ' ' )
 	print "initial matrix S is generated and logged to file S_init.txt !"
-# ---------------------------- #
-# NMF iteration ( using LSMU ) #
-# ---------------------------- #
+
+# ~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-= #
+# define a step size for each round of NMF process #
+# ~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-=~-= #
+NMF_OPERATION_STEPSIZE_inJ = 500
+NMF_OPERATION_STEPSIZE_inI = 8000
+
+# ------------- #
+# NMF iteration #
+# ------------- #
 for cycle in xrange( 0 , iteraNum ) :
 	# ------------- #
 	# update S part #
 	# ------------- #
-	for J_Idx_wikiFile in xrange( 0 , fileNum ) :
-		print "Cycle No. : %d / %d\tFile No. : %d / %d" %(cycle+1,iteraNum,J_Idx_wikiFile+1,fileNum)
+	J_IDX_OPERATION_SUBSECTION_STARTING_INDEX = range( fileNum )[ ::NMF_OPERATION_STEPSIZE_inJ ]
+	#for J_Idx_wikiFile in xrange( 0 , fileNum ) :
+	for J_Idx_wikiFile in J_IDX_OPERATION_SUBSECTION_STARTING_INDEX :
+		print "Cycle No. : %d / %d\tFile No. : %d-%d / %d" %(cycle+1,iteraNum,J_Idx_wikiFile+1,np.min( [ J_Idx_wikiFile+NMF_OPERATION_STEPSIZE_inJ , fileNum ] ),fileNum )
+		if J_Idx_wikiFile + NMF_OPERATION_STEPSIZE_inJ < fileNum :
+			Y_blockWidth = NMF_OPERATION_STEPSIZE_inJ
+		else :
+			Y_blockWidth = fileNum - J_Idx_wikiFile
+		Y_currCol = np.zeros( [ wordNum , Y_blockWidth ] )
 		# --------------------------------- #
 		# obtain the corresponding Y column #
 		# --------------------------------- #
-		Y_currCol = np.zeros(  wordNum ) #scipy.optimize.nnls uses np.array
-		for word in wikiHash[ J_Idx_wikiFile ][ '_wordprofile' ] :
-			Y_currCol[ existWordList_hash[word] ] = existWord[ word ][ J_Idx_wikiFile ]
-			if np.max( Y_currCol ) == 0.0 :
-				print "All Zeros Column encountered !"
-				print "a very small nonnegative value is used !"
-				Y_currCol[:,0] = 0.000000001
-		A_no_use , S_Jcolumn = NMF.HALS( np.matrix( Y_currCol ).transpose() , A , np.matrix( S[ : , J_Idx_wikiFile ] ).transpose() , 1 , [1,1] , 1 )
+		#Y_currCol = np.zeros(  wordNum ) #scipy.optimize.nnls uses np.array
+		smallValueAsgn_cnt = 0
+		for J_Idx_wikiFile_subIndexOffset in xrange( Y_blockWidth ) :
+			for word in wikiHash[ J_Idx_wikiFile ][ '_wordprofile' ] :
+				if existWord[ word ].has_key( J_Idx_wikiFile + J_Idx_wikiFile_subIndexOffset ) :
+					Y_currCol[ existWordList_hash[word] , J_Idx_wikiFile_subIndexOffset ] = existWord[ word ][ J_Idx_wikiFile + J_Idx_wikiFile_subIndexOffset ]
+			if np.max( Y_currCol[ : , J_Idx_wikiFile_subIndexOffset ] ) == 0.0 :
+			#	print "All Zeros Column encountered !"
+			#	print "a very small nonnegative value is used !"
+				Y_currCol[ : , J_Idx_wikiFile_subIndexOffset ] = 0.000000001
+				smallValueAsgn_cnt += 1
+		print ""
+		print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		print "no. of all zeros column that  "
+		print "are assignment to a very small"
+		print "non-negative value : %d/%d" %(smallValueAsgn_cnt,Y_blockWidth)
+		print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+		print ""
+		#A_no_use , S_Jcolumn = NMF.HALS( np.matrix( Y_currCol ).transpose() , A , np.matrix( S[ : , J_Idx_wikiFile : J_Idx_wikiFile + Y_blockWidth ] ).transpose() , 1 , [1,1] , 1 )
+		#A_no_use , S_Jcolumn = NMF.HALS( np.matrix( Y_currCol ) , A , np.matrix( S[ : , J_Idx_wikiFile : J_Idx_wikiFile + Y_blockWidth ] ) , 1 , [1,1] , 1 )
+		S_Jcolumn = NMF.HALS_CORE( np.matrix( Y_currCol ).transpose() , np.matrix( S[ : , J_Idx_wikiFile : J_Idx_wikiFile + Y_blockWidth ] ).transpose() , A.transpose() , modelOrder ).transpose()
 		for k in xrange( 0 , modelOrder ) :
-			S[ k , J_Idx_wikiFile ] = S_Jcolumn[k]
+			for J_assignmentOffset in xrange( Y_blockWidth ) :
+				S[ k , J_Idx_wikiFile + J_assignmentOffset ] = S_Jcolumn[ k , J_assignmentOffset ]
 	#DSP.LOG( 'log matrix to file' , 'S_LSMU_itera'+str(cycle+1)+'.txt' , S , ' ' )
 	DSP.LOG( 'log matrix to file' , 'S_HALS_itera'+str(cycle+1)+'.txt' , S , ' ' )
 	print "S has been logged in cycle %d" %(cycle+1)
 	DSP.STOP()
 	# ------------- #
 	# update A part #
-	# ------------- #	
-	Y_currRow = np.zeros( fileNum )
-	for I_Idx_existWord in xrange( 0 , wordNum ) :
-		print "Cycle No. : %d / %d\tWord No. : %d / %d" %(cycle+1,iteraNum,I_Idx_existWord+1,wordNum)
+	# ------------- #
+	I_IDX_OPERATION_SUBSECTION_STARTING_INDEX = range( wordNum )[ ::NMF_OPERATION_STEPSIZE_inI ]
+	#for I_Idx_existWord in xrange( 0 , wordNum ) :
+	for I_Idx_existWord in I_IDX_OPERATION_SUBSECTION_STARTING_INDEX :
+		print "Cycle No. : %d / %d\tWord No. : %d-%d / %d" %(cycle+1,iteraNum,I_Idx_existWord+1,np.min( [ I_Idx_existWord+NMF_OPERATION_STEPSIZE_inI , wordNum ] ),wordNum)
+		if I_Idx_existWord+NMF_OPERATION_STEPSIZE_inI < wordNum :
+			Y_blockHeight = NMF_OPERATION_STEPSIZE_inI
+		else :
+			Y_blockHeight = wordNum - I_Idx_existWord
+		# ------------------------------ #
+		# obtain the corresponding Y row #			
+		# ------------------------------ #			
+		#Y_currRow = np.zeros( fileNum )  			
+		Y_currRow = np.zeros( [ Y_blockHeight , fileNum ] )
 		for Idx_wikiFile in xrange( 0 , fileNum ) :
 			currFile_wordProfile = wikiHash[ Idx_wikiFile ][ '_wordprofile' ]
-			if currFile_wordProfile.has_key( existWordList[I_Idx_existWord] ) :
-				Y_currRow[ Idx_wikiFile ] = currFile_wordProfile[ existWordList[ I_Idx_existWord ] ]
-				break
+			for I_Idx_existWord_subIndexOffset in xrange( Y_blockHeight ) :
+				if currFile_wordProfile.has_key( existWordList[I_Idx_existWord] ) :
+					Y_currRow[ I_Idx_existWord_subIndexOffset , Idx_wikiFile ] = currFile_wordProfile[ existWordList[ I_Idx_existWord + I_Idx_existWord_subIndexOffset ] ]
+					break
 		#A_Irow , S_no_use = NMF.LSMU( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord , : ] ) , S , 1 , 0 )
-		A_Irow , S_no_use = NMF.HALS( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord , : ] ) , S , 1 , [1,1] , 0 )
-		A[ I_Idx_existWord , : ] = A_Irow
+		#A_Irow , S_no_use = NMF.HALS( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord : I_Idx_existWord + Y_blockHeight , : ] ) , S , 1 , [1,1] , 0 )
+		A_Irow = NMF.HALS_CORE( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord : I_Idx_existWord + Y_blockHeight , : ] ) , S , modelOrder )
+		for I_assignmentOffset in xrange( Y_blockHeight ) :
+			A[ I_Idx_existWord + I_assignmentOffset , : ] = A_Irow[ I_assignmentOffset , : ]
 	#DSP.LOG( 'log matrix to file' , 'A_LSMU_itera'+str(cycle+1)+'.txt' , A , ' ' )
 	DSP.LOG( 'log matrix to file' , 'A_HALS_itera'+str(cycle+1)+'.txt' , A , ' ' )
 	print "A has been logged in cycle %d" %(cycle+1)
