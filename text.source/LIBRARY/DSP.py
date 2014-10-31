@@ -105,7 +105,7 @@ def READUSGSDATA( fileName ) :
 # ==== #
 # PLOT #
 # ==== #
-def PLOT( y , x=None , yLabel=None , xLabel=None , title=None , axis=None , grid=None ) :
+def PLOT( y , x=None , yLabel=None , xLabel=None , title=None , axis=None , grid=None , saveFileName=None ) :
 	
 	#plt.ion() # enable interactive mode
 	
@@ -138,10 +138,9 @@ def PLOT( y , x=None , yLabel=None , xLabel=None , title=None , axis=None , grid
         else :
                 plt.plot( y )
 	
+	if saveFileName != None :
+		plt.savefig( saveFileName , bbox_inches='tight' )
         plt.show()
-	#print "continue ..."
-	#plt.show()
-	
 	return
 
 
