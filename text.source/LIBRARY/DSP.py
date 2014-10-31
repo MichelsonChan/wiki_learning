@@ -268,3 +268,12 @@ def SPARSEVEC2VEC( sparsevec , vectorSize=0 ) :
 	for i in range( 0 , sparseFileSize ) :
 		vector[ sparsevec[ i , 0 ] ] = sparsevec[ i , 1 ]
 	return vector
+
+
+# ====== #
+# IMSHOW #
+# ====== #
+def IMSHOW( inputMatrix ) :
+	plt.imshow( inputMatrix )
+	plt.show()
+
