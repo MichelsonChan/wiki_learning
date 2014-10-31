@@ -258,7 +258,7 @@ for cycle in xrange( iteraNum ) :
 	print "Cycle %d has finished.  A and S has been logged." %(cycle+1)
 	DSP.STOP()
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-del cycle , J_IDX , logFileName
+del cycle , logFileName
 del J_IDX_OPERATION_SUBSECTION_STARTING_INDEX , J_Idx_wikiFile  , Y_blockWidth  , Y_currCol ,                                       smallValueAsgn_cnt , J_Idx_wikiFile_subIndexOffset  , word , S_Jcolumn , k , J_assignmentOffset
 del I_IDX_OPERATION_SUBSECTION_STARTING_INDEX , I_Idx_existWord , Y_blockHeight , Y_currRow , Idx_wikiFile , currFile_wordProfile ,                      I_Idx_existWord_subIndexOffset ,        A_Irow        , I_assignmentOffset
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
