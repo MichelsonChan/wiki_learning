@@ -222,7 +222,9 @@ for cycle in xrange( iteraNum ) :
 		for k in xrange( modelOrder ) :
 			for J_assignmentOffset in xrange( Y_blockWidth ) :
 				S[ k , J_Idx_wikiFile + J_assignmentOffset ] = S_Jcolumn[ k , J_assignmentOffset ]
-	DSP.LOG( 'log matrix to file' , 'S_HALS_itera'+str(cycle+1)+'.txt' , S , ' ' )
+	logFileName = 'S_HALS_itera'+str(cycle+1)+'.txt'
+	#logFileName = 'S_LSMU_itera'+str(cycle+1)+'.txt'
+	DSP.LOG( 'log matrix to file' , logFileName , S , ' ' )
 	print "S has been logged in cycle %d" %(cycle+1)
 	DSP.STOP()
 	# ------------- #
@@ -249,12 +251,14 @@ for cycle in xrange( iteraNum ) :
 		A_Irow = NMF.HALS_CORE( np.matrix( Y_currRow ) , np.matrix( A[ I_Idx_existWord : I_Idx_existWord + Y_blockHeight , : ] ) , S , modelOrder )
 		for I_assignmentOffset in xrange( Y_blockHeight ) :
 			A[ I_Idx_existWord + I_assignmentOffset , : ] = A_Irow[ I_assignmentOffset , : ]
-	DSP.LOG( 'log matrix to file' , 'A_HALS_itera'+str(cycle+1)+'.txt' , A , ' ' )
+	logFileName = 'A_HALS_itera'+str(cycle+1)+'.txt'
+	#logFileName = 'A_LSMU_itera'+str(cycle+1)+'.txt'
+	DSP.LOG( 'log matrix to file' , logFileName , A , ' ' )
 	print "A has been logged in cycle %d" %(cycle+1)
 	print "Cycle %d has finished.  A and S has been logged." %(cycle+1)
 	DSP.STOP()
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-del cycle , J_IDX
+del cycle , J_IDX , logFileName
 del J_IDX_OPERATION_SUBSECTION_STARTING_INDEX , J_Idx_wikiFile  , Y_blockWidth  , Y_currCol ,                                       smallValueAsgn_cnt , J_Idx_wikiFile_subIndexOffset  , word , S_Jcolumn , k , J_assignmentOffset
 del I_IDX_OPERATION_SUBSECTION_STARTING_INDEX , I_Idx_existWord , Y_blockHeight , Y_currRow , Idx_wikiFile , currFile_wordProfile ,                      I_Idx_existWord_subIndexOffset ,        A_Irow        , I_assignmentOffset
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
