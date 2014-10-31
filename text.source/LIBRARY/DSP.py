@@ -144,6 +144,46 @@ def PLOT( y , x=None , yLabel=None , xLabel=None , title=None , axis=None , grid
 	return
 
 
+# ======= #
+# SAVEFIG #
+# ======= #
+def SAVEFIG( y , x=None , yLabel=None , xLabel=None , title=None , axis=None , grid=None , saveFileName=None ) :
+	
+	#plt.ion() # enable interactive mode
+	
+        if yLabel != None :
+                plt.ylabel( yLabel ) # a string 
+	
+        if xLabel != None :
+                plt.xlabel( xLabel ) # a string
+	
+        if title  != None :
+                plt.title( title )   # a string
+	
+        if axis   != None :
+                plt.axis( axis )     # a 4-entry array
+	
+        if grid   != None :
+                if( grid == 1 or grid == True or grid.lower() == "true" ) :
+                                         #           ^
+                                         #           |
+                                         #           |
+                                         # note: this grid.lower() must
+                                         # be placed at last so that error
+                                         # would not be resulted when 
+                                         # grid is boolean or numeric 
+                        plt.grid(True)
+	
+        if x      != None :
+                plt.plot( x , y )
+	
+        else :
+                plt.plot( y )
+
+	plt.savefig( saveFileName , bbox_inches='tight' )
+	return
+
+
 # ==== #
 # NNLS #
 # ==== #
