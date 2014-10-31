@@ -175,10 +175,10 @@ def SAVEFIG( y , x=None , yLabel=None , xLabel=None , title=None , axis=None , g
                         plt.grid(True)
 	
         if x      != None :
-                plt.plot( x , y )
+                plt.plot( x , y , hold=False )
 	
         else :
-                plt.plot( y )
+                plt.plot( y , hold=False )
 
 	plt.savefig( saveFileName , bbox_inches='tight' )
 	return
