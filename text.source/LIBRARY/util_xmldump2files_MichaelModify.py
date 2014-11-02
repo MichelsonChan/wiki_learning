@@ -99,5 +99,5 @@ xml.sax.parse(sys.argv[1], WikiPageSplitter(sys.argv[2]))
 import re
 fl = os.listdir('.')
 for f in fl :
-	if re.search('text\.Talk',f) or re.search('Wikipedia',f) :
-		os.remove(f)
+    if re.search('text\.Talk',f) or re.search('Wikipedia',f) :
+        os.remove(f)
