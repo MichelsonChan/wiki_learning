@@ -6,6 +6,7 @@
 # import #
 # ====== #
 import os
+import math
 import numpy as np
 from numpy import linalg as LA
 import scipy.optimize.nnls
@@ -242,6 +243,35 @@ def NNLS( Y , A , S , iteraNum , firstUpdateMatrixFlag ) :
 # ============================= #
 # Lee Seung Mulplicative Update #
 # ============================= #
+def LSMU_CORE( V , W , H ) :
+	VHt = np.dot( V , H.transpose() )
+	HHt = np.dot( H , H.transpose() )
+	if np.sum(HHt) < 1e-12 :
+		print "Warning @ NMF.LSMU()"
+		print "HHt is too small !"
+		print "sum of HHt = %f" %( np.sum(HHt) )
+		print "Press any key to continue ..."
+		raw_input()
+		err
+	WHHt = np.dot( W , HHt )
+	if np.sum(WHHt) < 1e-12 :
+		print "Warngin @ NMF.LSMU()"
+		print "WHHt is too small !"
+		print "sum of WHHt = %f" %( np.sum(WHHt) )
+		print "Press any key to continue ..."
+		raw_input()
+		err
+	if len( WHHt[ WHHt < 1e-12 ] ) > 0 :
+	       print "Warning @ NMF.LSMU()"
+	       print "WHHt has element of value < 1e-12"
+	       print "Will assign 1e-12 to those values"
+	       WHHt[ WHHt < 1e-12 ] = 1e-12
+	       #print "Press any key to continue ..."
+	       #raw_input()
+	       #err
+	W = np.multiply( W , VHt / WHHt )
+	return W
+
 def LSMU( V , W0 , H0 , iteraNum , firstUpdateMatrixFlag ) :
 	# ========== #
 	# NMF Model: #
@@ -253,7 +283,6 @@ def LSMU( V , W0 , H0 , iteraNum , firstUpdateMatrixFlag ) :
 	vM , vN = V.shape
 	wM , wN = W0.shape
 	hM , hN = H0.shape
-
 	if wN != hM :
 		print "Error @ NMF.LSMU() : dimension mismatch !"
 		print "wN != hM !!!!!"
@@ -292,16 +321,48 @@ def LSMU( V , W0 , H0 , iteraNum , firstUpdateMatrixFlag ) :
 	# ============================= #
 	if firstUpdateMatrixFlag == 0 :
 		for i in range(0,iteraNum) :
-			W = np.multiply( W , ( np.dot(V,H.transpose()) / np.dot(W,np.dot(H,H.transpose())) ) )
-			H = np.multiply( H , ( np.dot(W.transpose(),V) / np.dot(W.transpose(),np.dot(W,H)) ) )
+			# -------- #
+			# update W #
+			# -------- #
+			W = LSMU_CORE( V , W , H )
+			W[ W == np.inf ] = 1073741824 # 2**30
+			for i in xrange( W.shape[0] ) :
+				for j in xrange( W.shape[1] ) :
+					if math.isnan( W[i,j] ) :
+						W[i,j] = 1e-12
+			# -------- #
+			# update H #
+			# -------- #
+			H = LSMU_CORE( V.transpose() , H.transpose() , W.transpose() ).transpose()
+			H[ H == np.inf ] = 1073741824 # 2**30
+			for i in xrange( H.shape[0] ) :
+				for j in xrange( H.shape[1] ) :
+					if math.isnan( H[i,j] ) :
+						H[i,j] = 1e-12
 	# ============================= #
-       	# if firstUpdateMatrixFlag == 0 #
+       	# if firstUpdateMatrixFlag == 1 #
        	# then update H matrix first    #
 	# ============================= #
 	elif firstUpdateMatrixFlag == 1 :
 		for i in range(0,iteraNum) :
-			H = np.multiply( H , ( np.dot(W.transpose(),V) / np.dot(W.transpose(),np.dot(W,H)) ) )
-			W = np.multiply( W , ( np.dot(V,H.transpose()) / np.dot(W,np.dot(H,H.transpose())) ) )
+			# -------- #
+			# update H #
+			# -------- #
+			H = LSMU_CORE( V.transpose() , H.transpose() , W.transpose() ).transpose()
+			H[ H == np.inf ] = 1073741824 # 2**30
+			for i in xrange( H.shape[0] ) :
+				for j in xrange( H.shape[1] ) :
+					if math.isnan( H[i,j] ) :
+						H[i,j] = 1e-12
+			# -------- #
+			# update W #
+			# -------- #
+			W = LSMU_CORE( V , W , H )
+			W[ W == np.inf ] = 1073741824 # 2**30
+			for i in xrange( W.shape[0] ) :
+				for j in xrange( W.shape[1] ) :
+					if math.isnan( W[i,j] ) :
+						W[i,j] = 1e-12
 	return W , H
 
 # ====================================== #
