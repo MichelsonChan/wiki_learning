@@ -60,6 +60,22 @@ def PREPROCESS_DICT( dictionaryFileNameStr ) :
 	dictLines  = list( set( dictLines ) )
 	dictLines.sort()
 	
+	# ---------------------------------------------------- #
+	# remove common words from dictionary                  #
+	# with reference to google 10000 common                #
+	# english words, source of info is from                #
+	# https://github.com/first20hours/google-10000-english #
+	# ---------------------------------------------------- #
+	fileObject = open("dictionary_google-10000-english.txt","r")
+	google10KWordLines = fileObject.read().splitlines()
+	google10KWordLines = list( set( google10KWordLines ) )
+	google10KWordLines.sort()
+	google10KWords = {}
+	for currWord in google10KWordLines :
+		google10KWords[ currWord ] = 0
+	for currWord in dictLines :
+		if google10KWords.has_key( currWord ) :
+			dictLines.remove( currWord )
 	# -------------- #
 	# export to file #
 	# -------------- #
