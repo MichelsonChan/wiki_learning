@@ -14,7 +14,7 @@ import numpy as np
 # ==================== #
 
 def PREPROCESS_DICT( dictionaryFileNameStr ) :
-	outputTextFileNameStr = dictionaryFileNameStr + ".np"
+	outputTextFileNameStr = dictionaryFileNameStr + "_np"
 	# ----------------------- #
 	# check file availability #
 	# ----------------------- #
