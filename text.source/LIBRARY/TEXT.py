@@ -36,7 +36,7 @@ def PREPROCESS_DICT( dictionaryFileNameStr ) :
 	# read dictionary file #
 	# -------------------- #
 	fileObject = open( dictionaryFileNameStr , 'r' )
-	dictLines  = fileObject.readlines()
+	dictLines  = fileObject.read().split()
 	fileObject.close()
 	# ----------------------------------- #
 	# punctuation and white space removal #
@@ -56,15 +56,16 @@ def PREPROCESS_DICT( dictionaryFileNameStr ) :
 		dictLines[k] = dictLines[k].replace(')','')
 	# -------------------------- #
 	# remove duplicates and sort #
-	# -------------------------- #
+	# -------------------------- #	
 	dictLines  = list( set( dictLines ) )
 	dictLines.sort()
+	
 	# -------------- #
 	# export to file #
 	# -------------- #
 	fileObject = open( outputTextFileNameStr , 'w' )
 	for k in range( 0 , len( dictLines ) ) :
-		fileObject.write( dictLines[k] )
+		fileObject.write( dictLines[k] + "\n" )
 	fileObject.close()
 	# ------ #
 	# finish #
